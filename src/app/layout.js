@@ -21,7 +21,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}>
+    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Navbar></Navbar>
         <Toaster position="top-center" reverseOrder={false} />

@@ -1,14 +1,14 @@
 import { getCompanyJobs } from "@/lib/api/jobs";
 import React from "react";
 import { Table, Chip, Button, Tooltip } from "@heroui/react";
-// Assuming Gravity Icons maps to standard lucide equivalents; adjust paths if using a custom package
 import { Eye, Edit2, Trash2 } from "lucide-react";
+import { getLoggedInRecruiterCompany } from "@/lib/api/companies";
 
 const RecruiterJobs = async () => {
-  const companyId = "company_123";
-  const jobs = (await getCompanyJobs(companyId)) || [];
+  const reqruiterCompany = await getLoggedInRecruiterCompany();
 
-  console.log(jobs.length, "From all jobs");
+  console.log(reqruiterCompany._id, "from jobs page");
+  const jobs = (await getCompanyJobs(reqruiterCompany._id)) || [];
 
   // Helper to determine status chip coloring
   const getStatusColor = (status) => {
@@ -45,6 +45,13 @@ const RecruiterJobs = async () => {
                 Location
                 <Table.ColumnResizer />
               </Table.Column>
+
+              {/* এখানে নতুন কলামটি যোগ করা হয়েছে (যাতে কলাম সংখ্যা ৫ থেকে ৬ হয়) */}
+              <Table.Column defaultWidth="1.2fr" id="publishDate" minWidth={130}>
+                Publish Date
+                <Table.ColumnResizer />
+              </Table.Column>
+
               <Table.Column defaultWidth="1fr" id="status" minWidth={100}>
                 Status
                 <Table.ColumnResizer />
@@ -55,55 +62,75 @@ const RecruiterJobs = async () => {
             </Table.Header>
 
             <Table.Body emptyContent={"No jobs found for this company."}>
-              {jobs.map((job) => (
-                <Table.Row key={job._id?.$oid || job._id}>
-                  {/* Job Title */}
-                  <Table.Cell>
-                    <div className="font-medium text-default-800">{job.jobTitle}</div>
-                  </Table.Cell>
+              {jobs.map((job) => {
+                const jobId = job._id?.$oid || job._id;
 
-                  {/* Type / Category */}
-                  <Table.Cell>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-sm capitalize font-medium">{job.jobType}</span>
-                      <span className="text-xs text-default-400 capitalize">{job.jobCategory}</span>
-                    </div>
-                  </Table.Cell>
+                const rawDate = job.createdAt?.$date || job.createdAt;
+                const publishDate = rawDate
+                  ? new Date(rawDate).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  : "N/A";
 
-                  {/* Location */}
-                  <Table.Cell>
-                    <span className="text-sm text-default-600">{job.isRemote ? "Remote" : job.location}</span>
-                  </Table.Cell>
+                return (
+                  <Table.Row key={jobId}>
+                    {/* 1. Job Title */}
+                    <Table.Cell>
+                      <div className="font-medium text-default-800">{job.jobTitle}</div>
+                    </Table.Cell>
 
-                  {/* Status */}
-                  <Table.Cell>
-                    <Chip color={getStatusColor(job.status)} size="sm" variant="soft" className="capitalize">
-                      {job.status || "Unknown"}
-                    </Chip>
-                  </Table.Cell>
+                    {/* 2. Type / Category */}
+                    <Table.Cell>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm capitalize font-medium">{job.jobType}</span>
+                        <span className="text-xs text-default-400 capitalize">{job.jobCategory}</span>
+                      </div>
+                    </Table.Cell>
 
-                  {/* Actions */}
-                  <Table.Cell>
-                    <div className="relative flex items-center gap-2">
-                      <Tooltip content="Video Details">
-                        <Button isIconOnly size="sm" variant="light" aria-label="View video details">
-                          <Eye className="text-default-400 w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Edit Job">
-                        <Button isIconOnly size="sm" variant="light" aria-label="Edit job">
-                          <Edit2 className="text-default-400 w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Delete Job">
-                        <Button isIconOnly size="sm" variant="light" color="danger" aria-label="Delete job">
-                          <Trash2 className="text-danger w-4 h-4" />
-                        </Button>
-                      </Tooltip>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
+                    {/* 3. Location */}
+                    <Table.Cell>
+                      <span className="text-sm text-default-600">{job.isRemote ? "Remote" : job.location}</span>
+                    </Table.Cell>
+
+                    {/* 4. Publish Date */}
+                    <Table.Cell>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-sm font-medium text-default-700">{publishDate}</span>
+                      </div>
+                    </Table.Cell>
+
+                    {/* 5. Status */}
+                    <Table.Cell>
+                      <Chip color={getStatusColor(job.status)} size="sm" variant="soft" className="capitalize">
+                        {job.status || "Unknown"}
+                      </Chip>
+                    </Table.Cell>
+
+                    {/* 6. Actions */}
+                    <Table.Cell>
+                      <div className="relative flex items-center gap-2">
+                        <Tooltip content="Video Details">
+                          <Button isIconOnly size="sm" variant="light" aria-label="View video details">
+                            <Eye className="text-default-400 w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip content="Edit Job">
+                          <Button isIconOnly size="sm" variant="light" aria-label="Edit job">
+                            <Edit2 className="text-default-400 w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip content="Delete Job">
+                          <Button isIconOnly size="sm" variant="light" color="danger" aria-label="Delete job">
+                            <Trash2 className="text-danger w-4 h-4" />
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
             </Table.Body>
           </Table.Content>
         </Table.ResizableContainer>

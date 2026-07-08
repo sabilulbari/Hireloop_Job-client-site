@@ -4,15 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import { useSession, signOut } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
+
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session, isPending } = useSession();
-  console.log("Session data in Navbar:", session, "Is pending:", isPending);
   const user = session?.user;
 
   const handleSignOut = async () => {
     await signOut();
+    router.refresh("/")
 
   }
 
