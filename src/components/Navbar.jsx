@@ -2,37 +2,42 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@heroui/react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-
-  const router = useRouter()
+  const router = useRouter();
+  const pathname = usePathname(); 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
   const handleSignOut = async () => {
     await signOut();
-    router.refresh("/")
+    router.refresh("/");
+  };
 
-  }
-
-  const navLinks = [
-    {
-      label: "Browse Jobs",
-      href: "/jobs",
-    },
-    {
-      label: "Company",
-      href: "/company",
-    },
-    {
-      label: "Pricing",
-      href: "/pricing",
-    },
+  const baseLinks = [
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Company", href: "/company" },
+    { label: "Pricing", href: "/plans" },
   ];
+
+  const dashboardLinks = {
+    seeker: "/dashboard/seeker",
+    recruiter: "/dashboard/recruiter",
+  };
+
+  const navLinks = [...baseLinks];
+
+  if (user?.email) {
+    navLinks.push({
+      label: "Dashboard",
+      href: dashboardLinks[user.role] || "/dashboard/seeker",
+    });
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-white/10 bg-[#0B0B0F]/80 backdrop-blur-xl">
@@ -42,11 +47,8 @@ export default function Navbar() {
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-500 shadow-lg">
             <span className="text-xl font-bold text-white">P</span>
           </div>
-
           <div className="hidden leading-none sm:block">
-            <h1 className="text-lg font-bold text-white">
-              Hire Loop
-            </h1>
+            <h1 className="text-lg font-bold text-white">Hire Loop</h1>
           </div>
         </Link>
 
@@ -56,16 +58,24 @@ export default function Navbar() {
           <div className="hidden items-center gap-6 md:flex">
             {/* Nav Links */}
             <ul className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-2">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="rounded-full px-4 py-2 text-sm font-medium text-gray-300 transition hover:bg-white/10 hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {navLinks.map((link, ind) => {
+                const isActive = pathname === link.href;
+
+                return (
+                  <li key={ind}>
+                    <Link
+                      href={link.href}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                        isActive
+                          ? "bg-violet-600 text-white font-semibold shadow-md"
+                          : "text-gray-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Vertical Divider */}
@@ -73,20 +83,21 @@ export default function Navbar() {
 
             {/* Auth Links */}
             <div className="flex items-center gap-4">
-              {
-                user ?
-                  <>
-                    Hi, {user.name}!
-                    <Button onClick={handleSignOut}
-                      variant="ghost">Sign Out</Button>
-                  </>
-                  :
-                  <Link
-                    href="/auth/signin"
-                    className="text-sm font-medium text-violet-400 transition hover:text-violet-300"
-                  >
-                    Sign In
-                  </Link>}
+              {user ? (
+                <>
+                  <span className="text-sm text-gray-300">Hi, {user.name}!</span>
+                  <Button onClick={handleSignOut} variant="ghost" className="text-white">
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Link
+                  href="/auth/signin"
+                  className="text-sm font-medium text-violet-400 transition hover:text-violet-300"
+                >
+                  Sign In
+                </Link>
+              )}
 
               <Button
                 as={Link}
@@ -106,34 +117,12 @@ export default function Navbar() {
             aria-label="Toggle Menu"
           >
             {isMenuOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
@@ -144,37 +133,48 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="border-t border-white/10 bg-[#0B0B0F] md:hidden">
           <div className="space-y-3 px-4 py-6">
-            {/* Nav Links */}
             <ul className="space-y-2">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="block rounded-xl px-4 py-3 text-base font-medium text-gray-300 transition hover:bg-white/5 hover:text-white"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              {navLinks.map((link) => {
+                // মোবাইল মেনুর জন্যও একটিভ লিংক চেক করা হচ্ছে
+                const isActive = pathname === link.href;
+
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={`block rounded-xl px-4 py-3 text-base font-medium transition ${
+                        isActive
+                          ? "bg-violet-600/20 text-violet-400 font-semibold"
+                          : "text-gray-300 hover:bg-white/5 hover:text-white"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Divider */}
             <div className="border-t border-white/10 pt-4">
               <div className="flex flex-col gap-3">
-                <Link
-                  href="/login"
-                  className="rounded-xl px-4 py-3 text-base font-medium text-violet-400 transition hover:bg-white/5"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
+                {!user && (
+                  <Link
+                    href="/auth/signin"
+                    className="rounded-xl px-4 py-3 text-base font-medium text-violet-400 transition hover:bg-white/5"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                )}
 
                 <Button
                   as={Link}
                   href="/register"
                   className="bg-white font-semibold text-black"
                   radius="lg"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Get Started
                 </Button>

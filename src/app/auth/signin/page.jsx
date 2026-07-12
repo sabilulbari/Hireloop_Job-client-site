@@ -16,7 +16,6 @@ export default function SigninPage() {
     const searchParams = useSearchParams()
     const redirectTo = searchParams.get("redirect") || "/";
 
-    console.log(redirectTo);
     // UI States
     const [isVisible, setIsVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
