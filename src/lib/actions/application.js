@@ -1,6 +1,6 @@
 "use server";
 
-import { serverFetch, serverMutation } from "../core/server";
+import { protectedFetch, serverFetch, serverMutation } from "../core/server";
 
 
 export const submitApplication = async (applicationData) => {
@@ -8,7 +8,7 @@ export const submitApplication = async (applicationData) => {
 };
 
 export const getApplicationById = async (userId) =>{
-    return serverFetch(`/api/my/applications?applicantId=${userId}`);
+    return protectedFetch(`/api/my/applications?applicantId=${userId}`);
 };
 
 export const getApplicationByIdAndJobId = async (userId, jobId) =>{

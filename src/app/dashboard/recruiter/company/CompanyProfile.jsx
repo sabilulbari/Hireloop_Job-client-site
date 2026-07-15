@@ -18,6 +18,7 @@ const textAreaClass = "w-full bg-zinc-900/50 border border-zinc-800 text-white r
 
 export default function CompanyProfile({ recruiter, recruiterCompany }) {
   const router = useRouter();
+
   // 1. Core State
   const [company, setCompany] = useState(recruiterCompany);
   const [isEditing, setIsEditing] = useState(false);
@@ -103,7 +104,6 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       if (company?._id) {
         payload = await updateCompany(company._id, newCompanyData);
 
-        console.log(newCompanyData, "new data data");
 
         if (payload.success || payload.modifiedCount > 0 || payload.matchedCount > 0) {
           toast.success("Company profile updated successfully!");
@@ -116,7 +116,6 @@ export default function CompanyProfile({ recruiter, recruiterCompany }) {
       } else {
         payload = await createCompany(newCompanyData);
 
-        console.log(newCompanyData, "new data data");
 
         if (payload.insertedId) {
           toast.success("Company profile created successfully!");

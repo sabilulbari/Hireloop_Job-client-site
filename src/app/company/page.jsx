@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CompanyPage = () => {
+const CompanyPage = async() => {
     return (
         <div>
             <h2>Here is the company page</h2>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Button } from "@heroui/react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ export default function Navbar() {
   const handleSignOut = async () => {
     await signOut();
     router.refresh("/");
+    redirect("/auth/signin");
   };
 
   const baseLinks = [
@@ -28,6 +29,7 @@ export default function Navbar() {
   const dashboardLinks = {
     seeker: "/dashboard/seeker",
     recruiter: "/dashboard/recruiter",
+    admin: "/dashboard/admin",
   };
 
   const navLinks = [...baseLinks];

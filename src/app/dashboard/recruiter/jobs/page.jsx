@@ -1,14 +1,13 @@
-import { getCompanyJobs } from "@/lib/api/jobs";
+import { getCompanyJobs, getRecruiterPostJobByCompanyId } from "@/lib/api/jobs";
 import React from "react";
 import { Table, Chip, Button, Tooltip } from "@heroui/react";
 import { Eye, Edit2, Trash2 } from "lucide-react";
 import { getLoggedInRecruiterCompany } from "@/lib/api/companies";
 
 const RecruiterJobs = async () => {
-  const reqruiterCompany = await getLoggedInRecruiterCompany();
+  const recruiterCompany = await getLoggedInRecruiterCompany();
 
-  console.log(reqruiterCompany._id, "from jobs page");
-  const jobs = (await getCompanyJobs(reqruiterCompany._id)) || [];
+  const jobs = (await getRecruiterPostJobByCompanyId(recruiterCompany._id)) || [];
 
   // Helper to determine status chip coloring
   const getStatusColor = (status) => {

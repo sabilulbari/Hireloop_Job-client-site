@@ -1,7 +1,7 @@
 import { getUserSession } from "@/lib/core/session";
 import { LayoutSideContentLeft, Bell, Briefcase, Envelope, Gear, House, Magnifier, Person, Bookmark, FileText, CreditCard } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
-import { LayoutGrid, Search } from "lucide-react";
+import { Building, LayoutGrid, Search, Users } from "lucide-react";
 import Link from "next/link";
 
 export async function DashboardSidebar() {
@@ -18,15 +18,24 @@ export async function DashboardSidebar() {
   ];
 
   const seekerItems = [
-    { icon: LayoutGrid, href: "/dashboard", label: "Dashboard" },
-    { icon: Search, href: "/jobs", label: "Jobs" },
-    { icon: Bookmark, href: "/saved-jobs", label: "Saved Jobs" },
-    { icon: FileText, href: "/applications", label: "Applications" },
-    { icon: CreditCard, href: "/billing", label: "Billing" },
-    { icon: Gear, href: "/settings", label: "Settings" },
+    { icon: LayoutGrid, href: "/dashboard/seeker", label: "Dashboard" },
+    { icon: Search, href: "/dashboard/seeker/jobs", label: "Jobs" },
+    { icon: Bookmark, href: "/dashboard/seeker/saved-jobs", label: "Saved Jobs" },
+    { icon: FileText, href: "/dashboard/seeker/applications", label: "Applications" },
+    { icon: CreditCard, href: "/dashboard/seeker/billing", label: "Billing" },
+    { icon: Gear, href: "/dashboard/seeker/settings", label: "Settings" },
   ];
 
-  const navItems = user?.role === "recruiter" ? reqruiterItems : seekerItems;
+  const adminItems = [
+    { icon: LayoutGrid, href: "/dashboard/admin", label: "Dashboard" },
+    { icon: Users, href: "/dashboard/admin/users", label: "Users" },
+    { icon: Building, href: "/dashboard/admin/companies", label: "Companies" },
+    { icon: Briefcase, href: "/dashboard/admin/jobs", label: "Jobs" },
+    { icon: CreditCard, href: "/dashboard/admin/payments", label: "Payments" },
+    { icon: Gear, href: "/dashboard/admin/settings", label: "Settings" },
+  ];
+
+  const navItems = user?.role === "recruiter" ? reqruiterItems : user?.role === "admin" ? adminItems : seekerItems;
 
   const navContent = (
     <nav className="flex flex-col gap-1">

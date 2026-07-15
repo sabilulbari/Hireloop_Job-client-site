@@ -6,6 +6,8 @@ const NewJobPage = async () => {
 
   const companyData = await getLoggedInRecruiterCompany()
 
+  console.log(companyData, "company data in new job page");
+
 
 
   return (
